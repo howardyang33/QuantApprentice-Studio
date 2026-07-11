@@ -1,6 +1,6 @@
-# QuantApprentice Studio 干净版
+# QuantApprentice Studio
 
-这是一个适合上传到 GitHub 的精简代码包，包含 QuantApprentice Studio 产品工作台和它依赖的 clean 核心代码。
+本目录包含 QuantApprentice Studio 产品工作台和它依赖的 clean 核心代码。
 
 本目录不包含数据集、模型权重、运行输出、中间产物、导入论文资产或测试报告。使用时需要自行准备数据、模型服务和必要的环境变量。
 
@@ -53,11 +53,9 @@ export QA_LIVE_MODEL_API_KEY="EMPTY"
 export TUSHARE_TOKEN="你的TushareToken"
 ```
 
-请不要把真实 token 写进 GitHub 仓库。建议只通过环境变量或私有 secret 配置传入。
-
 ## 数据说明
 
-本干净版没有附带：
+本目录没有附带：
 
 - 历史行情 CSV / Parquet；
 - demo 数据集；
