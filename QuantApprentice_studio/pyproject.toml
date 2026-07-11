@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quant-apprentice-studio"
+version = "0.1.0"
+description = "Agent-oriented studio runtime for the final QuantApprentice GPT-OSS line"
+requires-python = ">=3.10"
+dependencies = [
+  "pandas>=1.5.0",
+  "numpy>=1.23.0",
+  "joblib>=1.2.0",
+]
+
+[project.optional-dependencies]
+api = [
+  "fastapi>=0.115.0",
+  "uvicorn>=0.30.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["quant_apprentice_studio*"]
+

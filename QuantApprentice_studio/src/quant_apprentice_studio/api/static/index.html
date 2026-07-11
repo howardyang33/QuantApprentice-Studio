@@ -1,0 +1,1482 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QuantApprentice Studio</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="product-shell">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <p class="eyebrow">QuantApprentice Studio</p>
+          <h1>股票研究助手</h1>
+          <p class="sidebar-copy">
+            普通模式用自然语言完成股票研究与评分；专业模式保留完整数据、流程、Teacher Zoo、Lesson 与来源追溯工具。
+          </p>
+        </div>
+
+        <div class="mode-switch" aria-label="Mode switch">
+          <button id="mode-simple-toggle" type="button" class="mode-pill is-active" data-workspace-target="simple">普通模式</button>
+          <button id="mode-expert-toggle" type="button" class="mode-pill" data-workspace-target="full-pipeline">专业模式</button>
+        </div>
+
+        <nav class="sidebar-nav" aria-label="Main navigation">
+          <button class="workspace-tab is-active" data-workspace-target="simple">
+            <span class="nav-title">智能研究助手</span>
+            <span class="nav-subtitle">普通模式：自然语言看股票、评分和解释</span>
+          </button>
+          <button class="workspace-tab" data-workspace-target="full-pipeline">
+            <span class="nav-title">专业研究工作台</span>
+            <span class="nav-subtitle">专业模式：上传数据、训练流程、Agent 进度和关键产物</span>
+          </button>
+        </nav>
+
+        <section class="sidebar-context">
+          <div class="sidebar-context-card">
+            <span>Active Project</span>
+            <strong id="status-project">-</strong>
+          </div>
+          <div class="sidebar-context-card">
+            <span>Active Dataset</span>
+            <strong id="status-dataset">-</strong>
+          </div>
+          <div class="sidebar-context-card">
+            <span>Active Run</span>
+            <strong id="status-run">-</strong>
+          </div>
+          <div class="sidebar-context-card">
+            <span>Fallback Policy</span>
+            <strong id="status-fallback">-</strong>
+          </div>
+        </section>
+
+        <section class="sidebar-note">
+          <strong>System boundary</strong>
+          <p>
+            The studio does not silently fetch market data. Internet-dependent K-line download only runs when the user
+            explicitly chooses that data source.
+          </p>
+        </section>
+      </aside>
+
+      <div class="main-shell">
+        <header class="hero">
+          <div class="hero-copy">
+            <p class="eyebrow">Productized Research Operations</p>
+            <h2>From user intent to scored signals, with explicit data and provenance boundaries</h2>
+            <p class="hero-text">
+              Guided entry for non-experts, advanced controls for researchers, and a single place to see which dataset,
+              teacher set, lesson set, and fallback path produced every result.
+            </p>
+          </div>
+          <div class="hero-actions">
+            <details class="developer-links">
+              <summary>Developer tools</summary>
+              <div class="button-row compact">
+                <a class="ghost-button" href="/docs" target="_blank" rel="noreferrer">Swagger</a>
+                <a class="ghost-button" href="/openapi.json" target="_blank" rel="noreferrer">OpenAPI</a>
+              </div>
+            </details>
+          </div>
+        </header>
+
+        <section class="overview-strip">
+          <div class="metric-card">
+            <span class="metric-label">Profile</span>
+            <strong id="metric-profile">-</strong>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">A股教师库</span>
+            <strong id="metric-imported-teachers">-</strong>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Saved Runs</span>
+            <strong id="metric-runs">-</strong>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">本地 GPT-OSS</span>
+            <strong id="metric-runtime">-</strong>
+          </div>
+        </section>
+
+        <main class="workspace-stack">
+          <section class="workspace-panel is-active" data-workspace="simple">
+            <section class="panel simple-hero-panel">
+              <div class="simple-hero-copy">
+                <p class="panel-kicker">Simple Mode</p>
+                <h2>中文智能研究助手</h2>
+                <p class="panel-lead">
+                  直接用自然语言说你想看的股票，例如“今天看看 600519 怎么样”。
+                  助手会自动补最近 K 线、生成技术因子，并给出综合分、60/120 日视角、四个 Teacher 模型分项和简短理由。
+                </p>
+              </div>
+              <div class="simple-guard-card">
+                <strong>边界提醒</strong>
+                <ul class="compact-list">
+                  <li>只有明确要求查看具体股票时才会联网补行情。</li>
+                  <li>单股评分会自动从 K 线生成技术因子。</li>
+                  <li>评分是研究辅助，不构成投资建议。</li>
+                </ul>
+              </div>
+            </section>
+
+            <section class="panel quick-start-panel">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">Quick Start</p>
+                  <h2>你今天想做什么？</h2>
+                  <p class="panel-lead">选择一个入口，系统会自动把意图写入聊天，并进入同一套 task_intake 流程。</p>
+                </div>
+              </div>
+              <div class="quick-entry-grid">
+                <button class="quick-entry-card" type="button" data-simple-intent="我有自己的 A 股历史行情数据，想跑完整研究流程，并生成 Teacher Zoo、最终经验规则集和来源追溯。">
+                  <span>A</span>
+                  <strong>用自己的市场数据跑完整研究流程</strong>
+                  <p>上传 OHLCV/amount 数据，生成 dataset_manifest、run_spec，然后监控 full pipeline。</p>
+                </button>
+                <button class="quick-entry-card" type="button" data-simple-intent="我有一批结构化候选信号，想用系统已有的 A 股老师库做评分校验；如果本地 GPT-OSS 可用，也希望做 live scoring。">
+                  <span>B</span>
+                  <strong>上传候选信号进行评分</strong>
+                  <p>需要 signal_id、signal_date、symbol、signal_type 和结构化 features；旧字段 date 可作为 signal_date 别名。</p>
+                </button>
+                <button class="quick-entry-card" type="button" data-simple-intent="我想使用系统已有的 A 股老师库做一个演示，不上传新数据，重点查看教师模型库、最终经验规则集和来源追溯。">
+                  <span>C</span>
+                  <strong>使用系统已有老师库做演示</strong>
+                  <p>复用系统内已经训练好的 A 股老师库；如果用户自己训练新老师库，会在来源里单独标明。</p>
+                </button>
+                <button class="quick-entry-card" type="button" data-simple-intent="我想整理已有实验结果，并获得查看 workflow timeline、Teacher Zoo、Lesson Lab、Scoring Lab 和 provenance 的下一步入口。">
+                  <span>D</span>
+                  <strong>帮我整理已有实验结果</strong>
+                  <p>助手会先总结可看内容，再给出“查看专业复盘”的明确按钮。</p>
+                </button>
+              </div>
+            </section>
+
+            <details class="panel panel-soft terminology-panel">
+              <summary>
+                <span>术语说明 / 研究概念解释</span>
+                <small>展开查看 Teacher Zoo、final_lesson_set、fallback 和 runtime mode 的含义。</small>
+              </summary>
+              <div class="overview-strip">
+                <div class="kv"><span>Teacher / Teacher Zoo</span><strong>外循环训练出的信号评价老师集合</strong></div>
+                <div class="kv"><span>final_lesson_set</span><strong>内循环学到的最终评分规则</strong></div>
+                <div class="kv"><span>A股趋势回调与突破教师库</span><strong>已经通过 QuantApprentice 流程训练好的四位 A 股技术形态老师</strong></div>
+                <div class="kv"><span>本次训练老师库</span><strong>用户上传数据后，本次 workflow 新生成的老师库</strong></div>
+                <div class="kv"><span>fallback</span><strong>当前老师库不可用时，系统按策略使用备用老师库</strong></div>
+                <div class="kv"><span>prompt_only / dry_run / mock / 历史样本复核 / live</span><strong>前几项为校验或演示；live 会真实调用本地 GPT-OSS</strong></div>
+              </div>
+            </details>
+
+            <div class="simple-layout">
+              <section class="panel simple-chat-panel">
+                <div class="panel-head">
+                <div>
+                    <p class="panel-kicker">Natural Language Research</p>
+                    <h2>今天想看哪只股票？</h2>
+                    <p class="panel-lead">
+                      直接说“帮我看看 000001 今天能不能继续”。我会尽量自动补齐最近行情，
+                      给出综合评分、近 60 日 / 近 120 日视角、四个老师模型看法和简短理由。
+                    </p>
+                  </div>
+                </div>
+
+                <div class="chat-thread" id="simple-chat-messages">
+                  <article class="chat-bubble assistant">
+                    <span>QuantApprentice</span>
+                    <p>
+                      你好，直接告诉我你想看的股票或上传候选信号就可以。比如：“今天帮我看看 000001 这只股票”。
+                      我会尽量自动补齐最近 K 线，给出综合分、四个老师模型看法和简短理由。
+                    </p>
+                  </article>
+                </div>
+
+                <form class="simple-chat-form" id="simple-chat-form">
+                  <label>
+                    <span>自然语言输入</span>
+                    <textarea
+                      id="simple-chat-input"
+                      rows="3"
+                      placeholder="例如：今天帮我看看 000001 这只股票；或者上传候选信号后帮我评分。"
+                    ></textarea>
+                  </label>
+                    <div class="simple-composer-row">
+                      <label class="composer-file-button">
+                        <input id="simple-chat-upload-file" type="file" accept=".csv,.json,.parquet,application/json,text/csv" />
+                        <span>上传文件</span>
+                      </label>
+                    <div class="composer-file-name" id="simple-chat-upload-name">尚未选择文件</div>
+                    <label class="composer-kline-toggle" title="默认会在你明确要求查看股票时尝试补齐最近 K 线。关闭后更偏向只处理你上传的数据。">
+                      <input id="simple-natural-kline-toggle" type="checkbox" checked />
+                      <span>联网补行情</span>
+                    </label>
+                    <button id="simple-chat-upload-submit" type="button" class="action-button secondary is-hidden">上传并生成数据清单</button>
+                    <button type="submit" class="action-button">发送</button>
+                    <button id="simple-open-expert" type="button" class="action-button secondary">打开同一 Run 的专业模式</button>
+                  </div>
+                </form>
+
+                <div class="simple-intake-tools">
+                  <div class="notice-card compact" id="simple-tool-empty">
+                    <strong>选择任务后展开工具</strong>
+                    <p>你可以先点上方入口卡，或直接用中文说明目标。我会按任务类型展开数据上传、在线 K 线下载或信号评分工具。</p>
+                  </div>
+
+                  <section class="simple-tool-card" data-simple-tool="upload">
+                    <div>
+                      <p class="panel-kicker">File Upload</p>
+                      <h3 id="simple-upload-title">上传并生成数据清单</h3>
+                      <p id="simple-upload-copy">
+                        候选信号至少需要包含 signal_id、signal_date、symbol、signal_type 和 features。
+                        旧字段 date 可以作为 signal_date 的别名自动识别。
+                      </p>
+                    </div>
+                    <label>
+                      <span>CSV / JSON / Parquet</span>
+                      <input id="simple-upload-file" type="file" accept=".csv,.json,.parquet,application/json,text/csv" />
+                    </label>
+                    <div class="file-status-card" id="simple-upload-status">尚未选择文件。</div>
+                    <button id="simple-upload-button" type="button" class="action-button">上传并生成数据清单</button>
+                  </section>
+
+                  <section class="simple-tool-card" data-simple-tool="kline">
+                    <div>
+                      <p class="panel-kicker">Online Kline</p>
+                      <h3>显式下载 A 股 K 线</h3>
+                      <p>
+                        只有点击启动后才会联网。普通模式默认拉取近 120 交易日左右的 K 线，并在解释中同时给出近 60 日与近 120 日两个评分视角。
+                        依赖服务器网络、akshare、tushare 与 TUSHARE_TOKEN；不可用时仍可上传本地数据。
+                      </p>
+                    </div>
+                    <div class="form-grid two-col">
+                      <label>
+                        <span>Stock Codes</span>
+                        <input id="simple-kline-codes" type="text" placeholder="000001, 600519" />
+                      </label>
+                      <label>
+                        <span>Earliest Date（默认近 120 交易日）</span>
+                        <input id="simple-kline-earliest" type="text" value="" placeholder="自动：约 180 个自然日前" />
+                      </label>
+                      <label>
+                        <span>Adjust Type</span>
+                        <select id="simple-kline-adjust">
+                          <option value="qfq">qfq</option>
+                          <option value="hfq">hfq</option>
+                        </select>
+                      </label>
+                      <label class="checkbox-line">
+                        <input id="simple-kline-indexes" type="checkbox" checked />
+                        <span>Download indexes</span>
+                      </label>
+                    </div>
+                    <div class="button-row">
+                      <button id="simple-kline-button" type="button" class="action-button secondary">确认联网下载 A 股 K 线</button>
+                    </div>
+                  </section>
+
+                  <section class="simple-tool-card simple-scoring-card" data-simple-tool="scoring">
+                    <div>
+                      <p class="panel-kicker">Simple Scoring</p>
+                      <h3>结构化新信号评分流程</h3>
+                      <p>
+                        上传或粘贴候选信号后，系统会先校验 signal_id、signal_date、symbol、signal_type 和结构化 features。
+                        旧字段 date 可以作为 signal_date 的别名自动识别。
+                        默认先做 prompt preview / dry run / mock / 历史样本复核校验；当本地 GPT-OSS runtime 健康时，也可以切换到 live scoring。
+                      </p>
+                    </div>
+                    <div class="form-grid two-col">
+                      <label>
+                        <span>Lesson Source</span>
+                        <select id="simple-scoring-source">
+                          <option value="auto">自动：优先使用本次训练老师库，否则使用系统已有老师库</option>
+                          <option value="current_workflow">仅使用本次训练老师库</option>
+                          <option value="imported">系统已有 A 股老师库</option>
+                          <option value="imported_demo">系统已有老师库演示</option>
+                        </select>
+                      </label>
+                      <label>
+                        <span>Mode</span>
+                        <select id="simple-scoring-mode">
+                          <option value="prompt_only">prompt_only preview</option>
+                          <option value="dry_run">dry_run validation</option>
+                          <option value="mock">mock UI result</option>
+                          <option value="archived_replay">历史样本复核</option>
+                          <option value="live" disabled>live scoring (local GPT-OSS offline)</option>
+                        </select>
+                      </label>
+                      <label>
+                        <span>老师库经验版本</span>
+                        <select id="simple-scoring-lesson-alias"></select>
+                      </label>
+                      <label>
+                        <span>Schema Reference Run</span>
+                        <select id="simple-scoring-schema-run"></select>
+                      </label>
+                    </div>
+                    <label>
+                      <span>Paste Signal JSON / Batch JSON</span>
+                      <textarea
+                        id="simple-scoring-json"
+                        rows="8"
+                        placeholder='{"signal_id":"sig-001","signal_date":"2025-01-02","symbol":"000001","signal_type":"trend_pullback","features":{...}}'
+                      ></textarea>
+                    </label>
+                    <label>
+                      <span>Or Upload Structured Signal File</span>
+                      <input id="simple-scoring-file" type="file" accept=".json,.csv,.parquet,application/json,text/csv" />
+                    </label>
+                    <div class="form-grid two-col">
+                      <label class="checkbox-line">
+                        <input id="simple-scoring-allow-fallback" type="checkbox" />
+                        <span>如果本次训练老师库还没生成，允许使用系统已有老师库</span>
+                      </label>
+                      <label>
+                        <span>Archived Replay Symbol (optional)</span>
+                        <input id="simple-scoring-archived-symbol" type="text" placeholder="000151" />
+                      </label>
+                      <label>
+                        <span>Archived Replay Date (optional)</span>
+                        <input id="simple-scoring-archived-date" type="text" placeholder="2025-01-02" />
+                      </label>
+                    </div>
+                    <div class="notice-card compact warn-card" id="simple-scoring-runtime-note">
+                      <strong>Local GPT-OSS runtime offline</strong>
+                      <p>
+                        当前未连接到本地 GPT-OSS。你仍可使用 prompt_only / dry_run / mock / 历史样本复核；
+                        live scoring 需要先启动本地 vLLM 服务。任何 scoring 都不构成投资建议。
+                      </p>
+                    </div>
+                    <div class="button-row">
+                      <button id="simple-scoring-button" type="button" class="action-button">生成评分预览 / 校验产物</button>
+                      <span class="live-call-badge is-hidden" id="simple-scoring-live-badge">会真实调用模型</span>
+                      <button id="simple-scoring-expert-button" type="button" class="action-button secondary">打开 Expert Scoring</button>
+                    </div>
+                  </section>
+                </div>
+              </section>
+
+              <aside class="simple-state-rail">
+                <section class="panel simple-result-panel">
+                  <div class="panel-head">
+                    <div>
+                      <p class="panel-kicker">Result</p>
+                      <h2>研究结果</h2>
+                      <p class="panel-lead">这里会显示综合评分、四个老师模型看法、来源与异常提示。结果仅用于研究辅助，不构成投资建议。</p>
+                    </div>
+                  </div>
+                  <div class="natural-runtime-card" id="simple-natural-runtime">
+                    <strong>本地 GPT-OSS 状态检查中</strong>
+                    <p>如果模型可用，可以执行 live scoring；如果离线，只会做预览或数据校验。</p>
+                  </div>
+                  <div class="summary-card-grid compact" id="simple-scoring-summary"></div>
+                  <div class="teacher-score-grid" id="simple-scoring-teacher-breakdown"></div>
+                  <details class="details-block simple-next-actions" open>
+                    <summary>辅助动作</summary>
+                    <div class="action-list" id="simple-actions">
+                      <div class="empty-state">直接聊天或上传文件后，我会在这里给出必要动作。</div>
+                    </div>
+                  </details>
+                  <details class="details-block simple-technical-state">
+                    <summary>状态与来源追溯</summary>
+                    <div class="summary-card-grid compact" id="simple-task-state-cards"></div>
+                    <div class="notice-card compact" id="simple-boundary-warnings">
+                      <strong>系统边界</strong>
+                      <p>还没有收到用户需求。发送消息后这里会显示任务类型、缺失信息和数据隔离状态。</p>
+                    </div>
+                    <pre class="code-block compact" id="simple-scoring-raw"></pre>
+                  </details>
+                </section>
+
+                <section class="panel">
+                  <div class="panel-head">
+                    <div>
+                      <p class="panel-kicker">Task State</p>
+                      <h2>当前任务状态</h2>
+                    </div>
+                  </div>
+                  <div class="notice-card compact">
+                    <strong>已移入普通模式结果卡</strong>
+                    <p>普通模式默认只展示必要状态；完整任务状态请在专业模式查看。</p>
+                  </div>
+                </section>
+
+                <section class="panel">
+                  <div class="panel-head">
+                    <div>
+                      <p class="panel-kicker">Recommended Actions</p>
+                      <h2>建议动作</h2>
+                    </div>
+                  </div>
+                  <div class="empty-state">普通模式只保留结果卡里的必要按钮；更多操作请进入专业模式。</div>
+                </section>
+
+                <section class="panel">
+                  <div class="panel-head">
+                    <div>
+                      <p class="panel-kicker">Activity Timeline</p>
+                      <h2>Agent Activity Timeline</h2>
+                    </div>
+                  </div>
+                  <div class="notice-card compact timeline-note">
+                    <strong>阶段级映射</strong>
+                    <p>当前显示的是阶段级状态，由 workflow stage 映射到 Agent，不代表每个 Agent 都有独立实时事件。</p>
+                  </div>
+                  <div class="mini-timeline" id="simple-agent-timeline"></div>
+                  <details class="details-block tech-timeline-details">
+                    <summary>查看技术阶段</summary>
+                    <div class="mini-timeline" id="simple-agent-tech-timeline"></div>
+                    <div class="timeline-detail-card" id="simple-agent-detail"></div>
+                  </details>
+                </section>
+
+                <section class="panel">
+                  <div class="panel-head">
+                    <div>
+                      <p class="panel-kicker">Artifact Links</p>
+                      <h2>同一 run 的产物</h2>
+                    </div>
+                  </div>
+                  <div class="artifact-link-list" id="simple-artifact-links"></div>
+                </section>
+              </aside>
+            </div>
+          </section>
+
+          <section class="workspace-panel" data-workspace="dataset-lab">
+            <section class="panel panel-wide">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">Dataset Lab</p>
+                  <h2>当前 project / dataset 可用性与隔离状态</h2>
+                  <p class="panel-lead">
+                    这里读取 Simple Mode 同一个 project_id / dataset_id / run_id 的 dataset_manifest 与 project contract。
+                    raw JSON 默认折叠；核心字段用人类可读摘要展示。
+                  </p>
+                </div>
+              </div>
+              <div class="summary-card-grid" id="dataset-lab-summary"></div>
+              <div class="path-list" id="dataset-lab-paths"></div>
+            </section>
+            <div class="section-grid">
+              <section class="panel">
+                <div class="panel-head"><div><p class="panel-kicker">Schema</p><h2>Required / missing columns</h2></div></div>
+                <div id="dataset-lab-columns"></div>
+              </section>
+              <section class="panel">
+                <div class="panel-head"><div><p class="panel-kicker">Issues</p><h2>Warnings / fail reasons</h2></div></div>
+                <div id="dataset-lab-issues"></div>
+              </section>
+            </div>
+            <div class="section-grid">
+              <section class="panel">
+                <div class="panel-head"><div><p class="panel-kicker">Online Kline</p><h2>Job status / logs</h2></div></div>
+                <div class="summary-card-grid" id="dataset-lab-kline-summary"></div>
+                <pre class="code-block compact" id="dataset-lab-kline-logs">暂无 K-line job。</pre>
+              </section>
+              <section class="panel">
+                <div class="panel-head"><div><p class="panel-kicker">System Teacher Library Manifest</p><h2>系统已有老师库来源</h2></div></div>
+                <div id="dataset-lab-imported"></div>
+              </section>
+            </div>
+            <section class="panel panel-wide">
+              <details class="details-block">
+                <summary>Open raw dataset_manifest.json</summary>
+                <pre class="code-block compact" id="dataset-lab-raw"></pre>
+              </details>
+            </section>
+          </section>
+
+          <section class="workspace-panel" data-workspace="workflow-monitor">
+            <section class="panel panel-wide">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">Workflow Monitor</p>
+                  <h2>research_spec → outer_loop → frozen_eval → selection → inner_loop → final_lesson_set → scoring</h2>
+                  <p class="panel-lead">
+                    专业查看完整 pipeline。状态来自 run monitor / workflow_result / artifact summary；不存在的 artifact 显示 not generated。
+                  </p>
+                </div>
+                <div class="status-chip" id="workflow-lab-status-chip">No Run Loaded</div>
+              </div>
+              <div class="monitor-strip" id="workflow-lab-strip"></div>
+              <div class="timeline-grid" id="workflow-lab-chain"></div>
+            </section>
+          </section>
+
+          <section class="workspace-panel" data-workspace="teacher-zoo">
+            <section class="panel panel-wide">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">Teacher Zoo Lab</p>
+                  <h2>Teacher 生命周期与来源分区</h2>
+                  <p class="panel-lead">
+                    candidate = 外循环候选；validated = 基础验证通过；frozen = 完成 frozen eval；selected = 被选入 inner loop。
+                  </p>
+                </div>
+              </div>
+              <div class="summary-card-grid" id="teacher-lab-summary"></div>
+            </section>
+            <div class="section-grid">
+              <section class="panel"><div class="panel-head"><div><p class="panel-kicker">A股趋势回调与突破教师库</p><h2>训练得到的四位老师</h2></div></div><div class="teacher-list" id="teacher-lab-imported"></div></section>
+              <section class="panel"><div class="panel-head"><div><p class="panel-kicker">Selected</p><h2>Selected for inner loop</h2></div></div><div class="teacher-list" id="teacher-lab-selected"></div></section>
+            </div>
+            <div class="section-grid triple">
+              <section class="panel"><div class="panel-head"><div><p class="panel-kicker">Candidate</p><h2>Candidate teachers</h2></div></div><div class="teacher-list" id="teacher-lab-candidate"></div></section>
+              <section class="panel"><div class="panel-head"><div><p class="panel-kicker">Validated</p><h2>Validated teachers</h2></div></div><div class="teacher-list" id="teacher-lab-validated"></div></section>
+              <section class="panel"><div class="panel-head"><div><p class="panel-kicker">Frozen</p><h2>Frozen teachers</h2></div></div><div class="teacher-list" id="teacher-lab-frozen"></div></section>
+            </div>
+            <section class="panel panel-wide">
+              <div class="panel-head"><div><p class="panel-kicker">Rejected</p><h2>Rejected teachers</h2></div></div>
+              <div class="teacher-list" id="teacher-lab-rejected"></div>
+            </section>
+          </section>
+
+          <section class="workspace-panel" data-workspace="lesson-lab">
+            <section class="panel panel-wide">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">Lesson Lab</p>
+                  <h2>系统已有经验规则与本次 workflow final_lesson_set</h2>
+                  <p class="panel-lead">展示 lesson source、teacher scopes、warmup/alignment 摘要和 fallback。current workflow 缺失时给出下一步建议。</p>
+                </div>
+              </div>
+              <div class="summary-card-grid" id="lesson-lab-summary"></div>
+              <div id="lesson-lab-missing-advice"></div>
+            </section>
+            <div class="section-grid">
+              <section class="panel">
+                <div class="panel-head"><div><p class="panel-kicker">System Final Lessons</p><h2>系统老师库经验版本</h2></div></div>
+                <div class="stack-form"><label><span>老师库经验版本</span><select id="lesson-lab-imported-alias"></select></label></div>
+                <div class="summary-card-grid" id="lesson-lab-imported-summary"></div>
+                <div class="lesson-scope-grid" id="lesson-lab-imported-scopes"></div>
+              </section>
+              <section class="panel">
+                <div class="panel-head"><div><p class="panel-kicker">Current Workflow</p><h2>Final lesson set</h2></div></div>
+                <div class="summary-card-grid" id="lesson-lab-current-summary"></div>
+                <div class="lesson-scope-grid" id="lesson-lab-current-scopes"></div>
+              </section>
+            </div>
+          </section>
+
+          <section class="workspace-panel" data-workspace="overview">
+            <div class="section-grid">
+              <section class="panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="panel-kicker">Get Started</p>
+                    <h2>Choose the right route</h2>
+                    <p class="panel-lead">
+                      The studio supports two main user journeys: a full quantitative research pipeline on isolated data,
+                      and direct signal scoring using a built-in or current-workflow lesson set.
+                    </p>
+                  </div>
+                </div>
+                <div class="summary-card-grid" id="dashboard-quick-status"></div>
+                <div class="button-row">
+                  <button id="dashboard-go-full-pipeline" type="button" class="action-button">Open Full Pipeline</button>
+                  <button id="dashboard-go-scoring" type="button" class="action-button secondary">Open Signal Scoring</button>
+                  <button id="dashboard-go-library" type="button" class="action-button secondary">Open Teacher Library</button>
+                  <button id="dashboard-go-provenance" type="button" class="action-button secondary">Open Provenance</button>
+                </div>
+              </section>
+
+              <section class="panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="panel-kicker">Supported Work</p>
+                    <h2>What the product can do today</h2>
+                  </div>
+                </div>
+                <div class="capability-grid">
+                  <article class="capability-card">
+                    <h3>Full Research Pipeline</h3>
+                    <p>Ingest data, build a run spec, execute outer and inner loops, then track the resulting artifacts.</p>
+                  </article>
+                  <article class="capability-card">
+                    <h3>Signal Scoring</h3>
+                    <p>使用系统已有老师库或本次训练老师库，对上传信号或单股请求进行评分。</p>
+                  </article>
+                  <article class="capability-card">
+                    <h3>Teacher / Lesson Audit</h3>
+                    <p>查看老师库、老师状态、最终经验规则集和来源追溯。</p>
+                  </article>
+                  <article class="capability-card">
+                    <h3>Data Isolation</h3>
+                    <p>隔离不同用户项目和数据集，并明确标出结果来自哪个老师库。</p>
+                  </article>
+                </div>
+              </section>
+            </div>
+
+            <div class="section-grid triple">
+              <section class="panel">
+                <div class="panel-head"><div><p class="panel-kicker">A股趋势回调与突破教师库</p><h2>训练得到的四位 A 股技术形态老师</h2></div></div>
+                <div class="teacher-list compact-cards" id="dashboard-imported-teachers-preview"></div>
+              </section>
+              <section class="panel">
+                <div class="panel-head"><div><p class="panel-kicker">最终经验规则集</p><h2>可用经验版本</h2></div></div>
+                <div class="teacher-list compact-cards" id="dashboard-lesson-preview"></div>
+              </section>
+              <section class="panel">
+                <div class="panel-head"><div><p class="panel-kicker">Reference Markets</p><h2>Replay packs for scoring</h2></div></div>
+                <div class="teacher-list compact-cards" id="dashboard-market-preview"></div>
+              </section>
+            </div>
+          </section>
+
+          <section class="workspace-panel" data-workspace="full-pipeline">
+            <div class="expert-workbench">
+              <section class="panel expert-chat-panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="panel-kicker">Research Copilot</p>
+                    <h2>告诉我你想研究什么</h2>
+                    <p class="panel-lead">
+                      例如：“我上传了一份 A 股 OHLCV 数据，想训练偏趋势回调和突破延续的老师模型。”
+                      助手会生成任务理解、数据要求和下一步建议；真正启动 workflow 前仍会明确显示执行状态。
+                    </p>
+                  </div>
+                </div>
+                <div class="chat-thread expert-chat-thread" id="expert-chat-messages">
+                  <article class="chat-bubble assistant">
+                    <span>QuantApprentice Pro</span>
+                    <p>
+                      这里是专业模式。你可以上传数据，也可以直接描述研究目标。我会先帮你整理任务、检查数据是否足够，
+                      再把流程推进到 run spec 和 workflow 监控。
+                    </p>
+                  </article>
+                </div>
+                <form class="expert-chat-form" id="expert-chat-form">
+                  <label class="expert-chat-input-wrap">
+                    <span>研究目标</span>
+                    <textarea id="expert-chat-input" rows="3" placeholder="例如：用这份 A 股历史行情跑一个缩小版完整流程，重点寻找趋势回调和突破延续 teacher。"></textarea>
+                  </label>
+                  <div class="expert-composer-row">
+                    <label class="composer-file-button expert-upload-button" title="上传 CSV / JSON / Parquet 数据">
+                      <input id="expert-chat-upload-file" type="file" accept=".csv,.json,.parquet,application/json,text/csv" />
+                      <span>+</span>
+                    </label>
+                    <div class="composer-file-name" id="expert-chat-upload-name">未选择文件</div>
+                    <button type="submit" class="action-button">发送</button>
+                  </div>
+                </form>
+              </section>
+
+              <aside class="expert-progress-rail">
+                <section class="panel">
+                  <div class="panel-head">
+                    <div>
+                      <p class="panel-kicker">Agent Activity</p>
+                      <h2>当前工作进度</h2>
+                    </div>
+                  </div>
+                  <div class="notice-card compact timeline-note">
+                    <strong>当前流程</strong>
+                  </div>
+                  <div class="mini-timeline expert-agent-timeline" id="expert-agent-timeline"></div>
+                </section>
+              </aside>
+            </div>
+
+            <section class="panel panel-wide expert-stage-panel">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">Major Outputs</p>
+                  <h2>大阶段产物摘要</h2>
+                </div>
+              </div>
+              <div class="expert-stage-grid" id="expert-stage-grid"></div>
+            </section>
+
+            <details class="expert-advanced-details" id="expert-advanced-details">
+              <summary>
+                <span>高级调试抽屉</span>
+                <small>默认隐藏。只有需要查看 dataset manifest、run spec、完整 Teacher Zoo、Lesson Lab、Scoring Lab 或 provenance 路径时再展开。</small>
+              </summary>
+            <section class="panel panel-wide">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">Pipeline Journey</p>
+                  <h2>From user request to workflow execution</h2>
+                  <p class="panel-lead">
+                    This page is the main product entry for new research work. It walks from task classification to data
+                    onboarding, run artifact generation, and live workflow monitoring.
+                  </p>
+                </div>
+              </div>
+              <div class="flow-strip">
+                <article class="flow-card">
+                  <span class="flow-step">Step 1</span>
+                  <h3>Task Intake</h3>
+                  <p>Translate plain-language intent into a supported task family and clarify missing information.</p>
+                </article>
+                <article class="flow-card">
+                  <span class="flow-step">Step 2</span>
+                  <h3>Dataset Onboarding</h3>
+                  <p>Upload or download data explicitly, validate schema, and generate a dataset manifest.</p>
+                </article>
+                <article class="flow-card">
+                  <span class="flow-step">Step 3</span>
+                  <h3>Run &amp; Monitor</h3>
+                  <p>Create artifacts automatically, launch the workflow, and inspect the canonical execution chain.</p>
+                </article>
+              </div>
+            </section>
+
+            <div class="section-grid">
+              <section class="panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="panel-kicker">Guided Entry</p>
+                    <h2>Task Intake</h2>
+                    <p class="panel-lead">
+                      Describe the job in natural language. The system will classify it, state what data is needed, and
+                      warn when the request is underspecified.
+                    </p>
+                  </div>
+                </div>
+                <form class="stack-form" id="intake-form">
+                  <div class="form-grid two-col">
+                    <label>
+                      <span>Project ID</span>
+                      <input id="entry-project-id" type="text" value="default-project" />
+                    </label>
+                    <label>
+                      <span>Dataset ID</span>
+                      <input id="entry-dataset-id" type="text" value="default-dataset" />
+                    </label>
+                    <label>
+                      <span>Run ID</span>
+                      <input id="entry-run-id" type="text" value="guided-run" />
+                    </label>
+                    <label>
+                      <span>Profile</span>
+                      <input id="entry-profile" type="text" value="gpt_oss_20b_final" />
+                    </label>
+                  </div>
+                  <div class="toggle-row">
+                    <label class="checkbox-line">
+                      <input id="entry-allow-imported-fallback" type="checkbox" checked />
+                      <span>允许使用系统已有老师库作为备用</span>
+                    </label>
+                    <label class="checkbox-line">
+                      <input id="entry-allow-demo-fallback" type="checkbox" />
+                      <span>Allow demo fallback</span>
+                    </label>
+                  </div>
+                  <label>
+                    <span>What do you want the system to do?</span>
+                    <textarea
+                      id="intake-user-request"
+                      rows="7"
+                      placeholder="Example: Build a new isolated teacher set from uploaded OHLCV data, then internalize the selected teachers and score a new batch of signals."
+                    ></textarea>
+                  </label>
+                  <div class="button-row">
+                    <button type="submit" class="action-button">Analyze Request</button>
+                    <button id="intake-go-dataset" type="button" class="action-button secondary">Jump to Dataset Step</button>
+                  </div>
+                </form>
+              </section>
+
+              <section class="panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="panel-kicker">Task Result</p>
+                    <h2>Recommended route</h2>
+                  </div>
+                </div>
+                <div class="summary-card-grid" id="intake-summary-cards"></div>
+                <div class="result-grid single-stack">
+                  <section class="result-card">
+                    <h3>Plain-language summary</h3>
+                    <p class="result-text" id="intake-summary-text">No intake result yet.</p>
+                    <div class="pill-row" id="intake-next-step"></div>
+                  </section>
+                  <section class="result-card">
+                    <h3>System limits</h3>
+                    <ul class="bullet-list" id="intake-limitations"></ul>
+                  </section>
+                </div>
+                <div class="section-grid">
+                  <section class="panel panel-soft">
+                    <div class="panel-head"><div><p class="panel-kicker">Questions</p><h2>Clarifying questions</h2></div></div>
+                    <div id="intake-questions"></div>
+                  </section>
+                  <section class="panel panel-soft">
+                    <div class="panel-head"><div><p class="panel-kicker">Requirements</p><h2>Dataset requirements</h2></div></div>
+                    <div id="intake-requirements"></div>
+                  </section>
+                </div>
+              </section>
+            </div>
+
+            <div class="section-grid">
+              <section class="panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="panel-kicker">Onboarding Wizard</p>
+                    <h2>Dataset entry</h2>
+                    <p class="panel-lead">
+                      Choose a source, validate the data, and generate a manifest that can continue into the pipeline.
+                    </p>
+                  </div>
+                </div>
+                <div class="stack-form">
+                  <div class="notice-card compact">
+                    <strong>Current task type</strong>
+                    <p id="dataset-task-type">Analyze a task first to see required schema.</p>
+                  </div>
+                  <label>
+                    <span>Dataset Source</span>
+                    <select id="dataset-source-type">
+                      <option value="upload_local">Upload local CSV / JSON</option>
+                      <option value="imported_assets">Use built-in teacher library assets</option>
+                      <option value="online_kline">Download A-share Kline online</option>
+                    </select>
+                  </label>
+
+                  <form class="stack-form" id="dataset-form">
+                    <div id="dataset-source-upload-panel">
+                      <label>
+                        <span>Dataset File</span>
+                        <input id="dataset-file" type="file" accept=".csv,.json,.parquet,application/json,text/csv" />
+                      </label>
+                      <label>
+                        <span>Or Paste CSV / JSON</span>
+                        <textarea id="dataset-content" rows="10" placeholder="Optional: paste a small CSV or JSON payload here instead of selecting a file."></textarea>
+                      </label>
+                      <div class="button-row">
+                        <button type="submit" class="action-button">Validate &amp; Create Manifest</button>
+                      </div>
+                    </div>
+                  </form>
+
+                  <div id="dataset-source-imported-panel" class="source-panel" hidden>
+                    <div class="notice-card compact">
+                      <strong>系统已有老师库资产</strong>
+                      <p>
+                        复用当前系统 profile 中已经训练好的冻结老师和最终经验规则集。
+                      </p>
+                    </div>
+                    <div class="button-row">
+                      <button id="dataset-imported-assets-button" type="button" class="action-button">使用系统已有老师库</button>
+                    </div>
+                  </div>
+
+                  <div id="dataset-source-kline-panel" class="source-panel" hidden>
+                    <div class="notice-card compact warn-card">
+                      <strong>Explicit online download only</strong>
+                      <p>
+                        This route depends on server network access, <code>akshare</code>, <code>tushare</code>, and
+                        <code>TUSHARE_TOKEN</code>. If unavailable, use local upload instead.
+                      </p>
+                    </div>
+                    <div class="form-grid two-col">
+                      <label>
+                        <span>Earliest Date</span>
+                        <input id="kline-earliest-date" type="text" value="20190101" placeholder="YYYYMMDD" />
+                      </label>
+                      <label>
+                        <span>Adjust Type</span>
+                        <select id="kline-adjust-type">
+                          <option value="qfq">qfq</option>
+                          <option value="hfq">hfq</option>
+                        </select>
+                      </label>
+                    </div>
+                    <div class="form-grid two-col">
+                      <label class="checkbox-line">
+                        <input id="kline-full-refresh" type="checkbox" />
+                        <span>Full refresh</span>
+                      </label>
+                      <label class="checkbox-line">
+                        <input id="kline-update-indexes" type="checkbox" checked />
+                        <span>Download benchmark indexes</span>
+                      </label>
+                    </div>
+                    <label>
+                      <span>Stock Codes</span>
+                      <textarea id="kline-stock-codes" rows="8" placeholder="000001, 600000, 300750"></textarea>
+                    </label>
+                    <div class="button-row">
+                      <button id="kline-start-job" type="button" class="action-button">Start Online Download Job</button>
+                    </div>
+                  </div>
+
+                  <div class="button-row">
+                    <button id="dataset-go-wizard" type="button" class="action-button secondary">Continue to Run Wizard</button>
+                  </div>
+                </div>
+              </section>
+
+              <section class="panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="panel-kicker">What To Upload</p>
+                    <h2>Expected dataset contract</h2>
+                  </div>
+                </div>
+                <div id="dataset-requirement-cards"></div>
+                <div class="notice-card">
+                  <strong>Boundary reminder</strong>
+                  <p>
+                    If you only have stock codes or a text idea, the system will not silently fetch OHLCV, factors, or
+                    real-time bars. Online access only happens when you explicitly choose the K-line downloader.
+                  </p>
+                </div>
+              </section>
+            </div>
+
+            <section class="panel panel-wide">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">Validation Output</p>
+                  <h2>dataset_manifest.json preview</h2>
+                  <p class="panel-lead">
+                    The manifest captures schema completeness, date range, symbol coverage, warnings, fail reasons, and
+                    isolation status.
+                  </p>
+                </div>
+              </div>
+              <div class="summary-card-grid" id="dataset-summary-cards"></div>
+              <div class="path-list" id="dataset-paths"></div>
+              <div class="section-grid">
+                <section class="panel panel-soft">
+                  <div class="panel-head"><div><p class="panel-kicker">Online Job</p><h2>Kline download status</h2></div></div>
+                  <div class="summary-card-grid" id="kline-job-summary-cards"></div>
+                  <div id="kline-job-issues"></div>
+                </section>
+                <section class="panel panel-soft">
+                  <div class="panel-head"><div><p class="panel-kicker">Backend Logs</p><h2>Recent job logs</h2></div></div>
+                  <pre class="code-block" id="kline-job-logs">No K-line download job yet.</pre>
+                </section>
+              </div>
+              <div class="section-grid">
+                <section class="panel panel-soft">
+                  <div class="panel-head"><div><p class="panel-kicker">Issues</p><h2>Warnings &amp; fail reasons</h2></div></div>
+                  <div id="dataset-issues"></div>
+                </section>
+                <section class="panel panel-soft">
+                  <div class="panel-head"><div><p class="panel-kicker">Columns</p><h2>Required vs missing</h2></div></div>
+                  <div id="dataset-columns"></div>
+                </section>
+              </div>
+              <section class="panel panel-soft">
+                <div class="panel-head"><div><p class="panel-kicker">Preview</p><h2>Sample rows</h2></div></div>
+                <div class="table-wrap">
+                  <table class="data-table">
+                    <thead id="dataset-preview-head"></thead>
+                    <tbody id="dataset-preview-body"></tbody>
+                  </table>
+                </div>
+              </section>
+            </section>
+
+            <div class="section-grid">
+              <section class="panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="panel-kicker">Artifact Generator</p>
+                    <h2>Run Spec Wizard</h2>
+                    <p class="panel-lead">
+                      Generate project, dataset, run, and campaign artifacts automatically instead of hand-writing JSON.
+                    </p>
+                  </div>
+                </div>
+                <form class="stack-form" id="wizard-form">
+                  <label>
+                    <span>API Model</span>
+                    <input id="wizard-api-model" type="text" value="gpt-oss-20b" />
+                  </label>
+                  <div class="button-row">
+                    <button type="submit" class="action-button">Generate Wizard Artifacts</button>
+                    <button id="wizard-launch" type="button" class="action-button secondary">Launch Recommended Run</button>
+                    <button id="wizard-open-advanced" type="button" class="action-button secondary">Open Advanced Console</button>
+                  </div>
+                </form>
+              </section>
+
+              <section class="panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="panel-kicker">Natural-Language Output</p>
+                    <h2>What the system will do</h2>
+                  </div>
+                </div>
+                <div class="summary-card-grid" id="wizard-summary-cards"></div>
+                <div class="notice-card">
+                  <strong>Human-readable summary</strong>
+                  <p id="wizard-summary-text">No wizard artifacts yet.</p>
+                </div>
+              </section>
+            </div>
+
+            <section class="panel panel-wide">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">Planned Workflow</p>
+                  <h2>Pipeline route</h2>
+                </div>
+              </div>
+              <div class="timeline-grid" id="wizard-plan-grid"></div>
+              <div class="path-list" id="wizard-paths"></div>
+            </section>
+
+            <section class="panel panel-wide">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">Live Execution</p>
+                  <h2>Full Pipeline Monitor</h2>
+                  <p class="panel-lead">
+                    Tracks the canonical chain from research spec to scoring so you can verify what actually ran.
+                  </p>
+                </div>
+                <div class="status-chip" id="monitor-status-chip">No Run Loaded</div>
+              </div>
+              <div class="monitor-strip" id="monitor-strip"></div>
+              <div class="timeline-grid" id="monitor-grid"></div>
+            </section>
+            </details>
+          </section>
+
+          <section class="workspace-panel" data-workspace="scoring">
+            <section class="panel panel-wide">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">Scoring Lab</p>
+                  <h2>Simple Mode 生成的 scoring artifacts</h2>
+                  <p class="panel-lead">
+                    这里专业查看 scoring_input、signal_input_manifest、prompt preview、dry run、mock、历史样本复核与 scoring_provenance。
+                    prompt_only / dry_run 不会调用模型；live scoring 会调用本地 GPT-OSS。raw JSON 默认折叠。
+                  </p>
+                </div>
+              </div>
+              <div class="summary-card-grid" id="scoring-lab-summary"></div>
+              <div class="teacher-score-grid" id="scoring-lab-artifacts"></div>
+              <details class="details-block">
+                <summary>Open latest scoring raw JSON</summary>
+                <pre class="code-block compact" id="scoring-lab-raw"></pre>
+              </details>
+            </section>
+            <div class="section-grid">
+              <section class="panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="panel-kicker">Scoring Route</p>
+                    <h2>选择老师库与评分来源</h2>
+                    <p class="panel-lead">
+                      可以使用系统已有 A 股老师库，也可以在本次 workflow 生成新老师库后切换到本次训练结果。
+                    </p>
+                  </div>
+                </div>
+                <form class="stack-form" id="scoring-config-form">
+                  <label>
+                    <span>Market / Reference Run</span>
+                    <select id="scoring-recorded-run"></select>
+                  </label>
+                  <label>
+                    <span>Lesson Source</span>
+                    <select id="scoring-source">
+                      <option value="imported">系统已有老师库</option>
+                      <option value="current_workflow">本次训练老师库</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>老师库经验版本</span>
+                    <select id="scoring-lesson-alias"></select>
+                  </label>
+                  <label>
+                    <span>Input Mode</span>
+                    <select id="scoring-input-mode">
+                      <option value="recorded_replay">历史样本复核</option>
+                      <option value="external_single">Upload One Structured Signal</option>
+                      <option value="external_batch">Upload Signal Batch</option>
+                    </select>
+                  </label>
+                  <label class="checkbox-line">
+                    <input id="scoring-prompt-only" type="checkbox" />
+                    <span>Prompt only (do not call the model)</span>
+                  </label>
+                  <label>
+                    <span>Optional user intent</span>
+                    <textarea
+                      id="scoring-user-intent"
+                      rows="4"
+                      placeholder="Example: I want to know whether this signal still looks attractive for the next few trading days."
+                    ></textarea>
+                  </label>
+                </form>
+              </section>
+
+              <section class="panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="panel-kicker">Signal Input</p>
+                    <h2>Replay or upload a signal</h2>
+                    <p class="panel-lead">
+                      Natural language alone does not provide enough structured factors for scoring. Use historical sample review or
+                      upload canonical signal JSON / batch JSON.
+                    </p>
+                  </div>
+                </div>
+                <form class="stack-form" id="scoring-form">
+                  <div class="form-grid two-col" id="scoring-recorded-fields">
+                    <label>
+                      <span>Recorded Signal Date</span>
+                      <input id="scoring-signal-date" type="text" placeholder="YYYY-MM-DD" />
+                    </label>
+                    <label>
+                      <span>Recorded Symbol</span>
+                      <input id="scoring-symbol" type="text" placeholder="000151" />
+                    </label>
+                  </div>
+                  <label>
+                    <span>Signal JSON / Batch JSON Array</span>
+                    <textarea id="scoring-signal-json" rows="12" placeholder='{"symbol":"000001","signal_date":"2025-01-02","features":{...}} or [{"symbol":"..."}, {...}]'></textarea>
+                  </label>
+                  <label>
+                    <span>Or Upload JSON File</span>
+                    <input id="scoring-batch-file" type="file" accept=".json,application/json" />
+                  </label>
+                  <div class="button-row">
+                    <button type="submit" class="action-button">Run Scoring</button>
+                  </div>
+                </form>
+              </section>
+            </div>
+
+            <section class="panel panel-wide">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">Scoring Result</p>
+                  <h2>Score, explanation, teacher breakdown, provenance</h2>
+                  <p class="panel-lead">
+                    The result view makes lesson source, teacher source, and fallback usage explicit so users always know
+                    where the answer came from.
+                  </p>
+                </div>
+              </div>
+              <div class="summary-card-grid" id="scoring-result-summary"></div>
+              <div class="result-grid">
+                <section class="result-card">
+                  <h3>Primary result</h3>
+                  <div class="score-number" id="scoring-total-score">-</div>
+                  <p class="result-text" id="scoring-short-reason">No score yet.</p>
+                </section>
+                <section class="result-card">
+                  <h3>Per-teacher view</h3>
+                  <div class="teacher-score-grid" id="scoring-teacher-breakdown"></div>
+                </section>
+              </div>
+              <details class="details-block">
+                <summary>Show raw scoring payload</summary>
+                <pre class="code-block compact" id="scoring-raw"></pre>
+              </details>
+              <section class="panel panel-soft">
+                <div class="panel-head"><div><p class="panel-kicker">Batch Output</p><h2>Batch items</h2></div></div>
+                <div class="table-wrap">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Symbol</th>
+                        <th>Signal Date</th>
+                        <th>Total Score</th>
+                        <th>Lesson Source</th>
+                        <th>Teacher Source</th>
+                        <th>Fallback</th>
+                      </tr>
+                    </thead>
+                    <tbody id="scoring-batch-body"></tbody>
+                  </table>
+                </div>
+              </section>
+            </section>
+          </section>
+
+          <section class="workspace-panel" data-workspace="audit-trail">
+            <section class="panel panel-wide">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">Audit Trail</p>
+                  <h2>user_goal → task_intake → dataset_manifest → run_spec → research_campaign → workflow_result → teacher_selection → final_lesson_set → scoring_result</h2>
+                  <p class="panel-lead">
+                    把 provenance 从路径列表整理成 chain view。路径不会删除；raw JSON 默认折叠。
+                  </p>
+                </div>
+              </div>
+              <div class="summary-card-grid" id="audit-summary"></div>
+              <div class="timeline-grid audit-chain-grid" id="audit-chain"></div>
+            </section>
+            <section class="panel panel-wide">
+              <div class="panel-head"><div><p class="panel-kicker">All Artifact Paths</p><h2>可复制路径列表</h2></div></div>
+              <div class="path-list" id="audit-paths"></div>
+              <details class="details-block">
+                <summary>Open selected raw JSON</summary>
+                <pre class="code-block compact" id="audit-raw">Click an Open raw JSON button above.</pre>
+              </details>
+            </section>
+          </section>
+
+          <section class="workspace-panel" data-workspace="library">
+            <section class="panel panel-wide">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">Teacher &amp; Lesson Source Map</p>
+                  <h2>A股教师库与本次训练老师库</h2>
+                  <p class="panel-lead">
+                    这里区分已经训练好的系统老师库，以及用户本次 workflow 新生成的老师库，便于理解评分结果到底来自哪里。
+                  </p>
+                </div>
+              </div>
+              <div class="summary-card-grid" id="teacher-zoo-summary"></div>
+            </section>
+
+            <div class="section-grid">
+              <section class="panel">
+                <div class="panel-head"><div><p class="panel-kicker">A股趋势回调与突破教师库</p><h2>训练得到的四位冻结老师</h2></div></div>
+                <div class="teacher-list" id="imported-teacher-list"></div>
+              </section>
+              <section class="panel">
+                <div class="panel-head"><div><p class="panel-kicker">Current Workflow</p><h2>Selected teachers for inner loop</h2></div></div>
+                <div class="teacher-list" id="selected-teacher-list"></div>
+              </section>
+            </div>
+
+            <div class="section-grid triple">
+              <section class="panel">
+                <div class="panel-head"><div><p class="panel-kicker">Candidate</p><h2>Candidate teachers</h2></div></div>
+                <div class="teacher-list" id="candidate-teacher-list"></div>
+              </section>
+              <section class="panel">
+                <div class="panel-head"><div><p class="panel-kicker">Validated</p><h2>Validated teachers</h2></div></div>
+                <div class="teacher-list" id="validated-teacher-list"></div>
+              </section>
+              <section class="panel">
+                <div class="panel-head"><div><p class="panel-kicker">Frozen Eval</p><h2>Frozen teachers</h2></div></div>
+                <div class="teacher-list" id="frozen-teacher-list"></div>
+              </section>
+            </div>
+
+            <div class="section-grid">
+              <section class="panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="panel-kicker">经验规则浏览</p>
+                    <h2>浏览系统已有最终经验规则集</h2>
+                  </div>
+                </div>
+                <div class="stack-form">
+                  <label>
+                    <span>老师库经验版本</span>
+                    <select id="library-lesson-alias"></select>
+                  </label>
+                </div>
+                <div class="summary-card-grid" id="library-lesson-summary-cards"></div>
+                <div class="lesson-scope-grid" id="library-lesson-scope-grid"></div>
+              </section>
+
+              <section class="panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="panel-kicker">Current Workflow Final Lesson</p>
+                    <h2>Current workflow lesson set</h2>
+                  </div>
+                </div>
+                <div class="summary-card-grid" id="lesson-set-summary"></div>
+                <div class="lesson-scope-grid" id="lesson-scope-grid"></div>
+              </section>
+            </div>
+          </section>
+
+          <section class="workspace-panel" data-workspace="provenance">
+            <div class="section-grid">
+              <section class="panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="panel-kicker">Isolation Contract</p>
+                    <h2>Project / dataset context</h2>
+                    <p class="panel-lead">
+                      This contract governs where data, teachers, lessons, scoring outputs, and workflow artifacts are stored.
+                    </p>
+                  </div>
+                </div>
+                <form class="stack-form" id="project-form">
+                  <div class="form-grid two-col">
+                    <label>
+                      <span>Project ID</span>
+                      <input id="project-id" type="text" value="default-project" />
+                    </label>
+                    <label>
+                      <span>Dataset ID</span>
+                      <input id="dataset-id" type="text" value="default-dataset" />
+                    </label>
+                    <label>
+                      <span>Run ID</span>
+                      <input id="run-id" type="text" value="draft-run" />
+                    </label>
+                    <label>
+                      <span>Profile</span>
+                      <input id="project-profile" type="text" value="gpt_oss_20b_final" />
+                    </label>
+                  </div>
+                  <div class="toggle-row">
+                    <label class="checkbox-line">
+                      <input id="allow-imported-fallback" type="checkbox" checked />
+                      <span>允许使用系统已有老师库作为备用</span>
+                    </label>
+                    <label class="checkbox-line">
+                      <input id="allow-demo-fallback" type="checkbox" />
+                      <span>Allow demo fallback teacher</span>
+                    </label>
+                  </div>
+                  <div class="button-row">
+                    <button type="submit" class="action-button">Refresh Contract View</button>
+                  </div>
+                </form>
+              </section>
+
+              <section class="panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="panel-kicker">Current Contract</p>
+                    <h2>Summary</h2>
+                  </div>
+                </div>
+                <div class="summary-card-grid" id="project-summary-cards"></div>
+              </section>
+            </div>
+
+            <section class="panel panel-wide">
+              <div class="panel-head"><div><p class="panel-kicker">Contract Roots</p><h2>Project paths</h2></div></div>
+              <div class="path-list" id="contract-path-list"></div>
+            </section>
+
+            <section class="panel panel-wide">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">Saved Runs</p>
+                  <h2>Existing run specs</h2>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Project</th>
+                      <th>Dataset</th>
+                      <th>Run</th>
+                      <th>Mode</th>
+                      <th>Status</th>
+                      <th>Fallback Policy</th>
+                      <th>Use</th>
+                    </tr>
+                  </thead>
+                  <tbody id="run-spec-table-body"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="panel panel-wide">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">Artifact Chain</p>
+                  <h2>Run provenance</h2>
+                  <p class="panel-lead">
+                    Audit the active run end-to-end: project config, dataset manifest, run spec, research campaign,
+                    workflow result, selection summary, and artifact files.
+                  </p>
+                </div>
+              </div>
+              <div class="summary-card-grid" id="provenance-summary"></div>
+              <div class="path-list" id="provenance-paths"></div>
+            </section>
+          </section>
+
+          <section class="workspace-panel" data-workspace="advanced">
+            <section class="panel panel-wide">
+              <div class="notice-card warn-card">
+                <strong>Advanced Console 仅供研究员和开发调试使用</strong>
+                <p>
+                  普通用户建议使用 Simple Mode。这里保留 full_pipeline / outer_loop_only / inner_loop_only /
+                  scoring_only、manual run_spec 和 expert JSON preview 等手动能力。
+                </p>
+              </div>
+            </section>
+            <section class="panel panel-wide">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">Operator Mode</p>
+                  <h2>Advanced Run Spec</h2>
+                  <p class="panel-lead">
+                    Manual mode for researchers who already know the desired pipeline mode and want a more direct operator-style entry.
+                  </p>
+                </div>
+              </div>
+              <form class="stack-form" id="runspec-form">
+                <div class="form-grid two-col">
+                  <label>
+                    <span>Mode</span>
+                    <select id="runspec-mode">
+                      <option value="full_pipeline">full_pipeline</option>
+                      <option value="outer_loop_only">outer_loop_only</option>
+                      <option value="inner_loop_only">inner_loop_only</option>
+                      <option value="scoring_only">scoring_only</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>API Model</span>
+                    <input id="runspec-api-model" type="text" value="gpt-oss-20b" />
+                  </label>
+                </div>
+                <label>
+                  <span>Research Goal</span>
+                  <textarea id="runspec-goal" rows="5" placeholder="Describe the market hypothesis or research mandate for this run."></textarea>
+                </label>
+                <div class="button-row">
+                  <button type="submit" class="action-button">Generate Run Spec</button>
+                  <button id="launch-pipeline-button" type="button" class="action-button secondary">Launch Pipeline Now</button>
+                </div>
+              </form>
+            </section>
+
+            <section class="panel panel-wide">
+              <div class="panel-head"><div><p class="panel-kicker">Plan Output</p><h2>Run spec and pipeline plan</h2></div></div>
+              <div class="summary-card-grid" id="runspec-summary-cards"></div>
+              <div class="timeline-grid" id="runspec-plan-grid"></div>
+            </section>
+
+            <section class="panel panel-wide">
+              <div class="panel-head"><div><p class="panel-kicker">Wizard Raw Drafts</p><h2>Expert JSON previews</h2></div></div>
+              <details class="details-block">
+                <summary>Show raw project / dataset / run artifacts</summary>
+                <div class="details-grid">
+                  <label>
+                    <span>project_config.json</span>
+                    <textarea id="wizard-project-config-json" rows="10"></textarea>
+                  </label>
+                  <label>
+                    <span>dataset_manifest.json</span>
+                    <textarea id="wizard-dataset-manifest-json" rows="10"></textarea>
+                  </label>
+                  <label>
+                    <span>run_spec.json</span>
+                    <textarea id="wizard-run-spec-json" rows="12"></textarea>
+                  </label>
+                  <label>
+                    <span>research_campaign.json</span>
+                    <textarea id="wizard-campaign-json" rows="12"></textarea>
+                  </label>
+                </div>
+              </details>
+            </section>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>

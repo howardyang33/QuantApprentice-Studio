@@ -1,0 +1,17 @@
+{
+  "profile_id": "gpt_oss_20b_final",
+  "backbone": "gpt-oss-20b",
+  "note": "This GitHub-clean profile is a template. It does not include paper assets, teacher artifacts, lesson runs, market runs, or datasets. Import or generate those assets locally before using live paper-replay features.",
+  "original_quant_root": "${QA_STUDIO_ORIGINAL_QUANT_ROOT}",
+  "selection_dir": "${QA_STUDIO_ORIGINAL_QUANT_ROOT}/reports/<teacher_selection_dir>",
+  "digest_file": "${QA_STUDIO_ORIGINAL_QUANT_ROOT}/research_memory/<digest_file>",
+  "teacher_report_dirs": {},
+  "teacher_artifact_dirs": {},
+  "lesson_runs": {},
+  "market_runs": {},
+  "paper_tables": {},
+  "defaults": {
+    "alignment_seed_alias": "",
+    "market_run_alias": ""
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "teacher_scopes": [
+    {
+      "round_id": "round_038",
+      "source_round_id": "round_038",
+      "final_lesson_path": "reports/apprentice_loop/example_round_038/final_lesson.json",
+      "selected_checkpoint": "lesson_5",
+      "selection_method": "best_composite"
+    }
+  ]
+}

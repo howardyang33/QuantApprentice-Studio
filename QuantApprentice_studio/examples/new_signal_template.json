@@ -1,0 +1,28 @@
+{
+  "symbol": "000151",
+  "signal_date": "2025-01-02",
+  "entry_date": "2025-01-03",
+  "exit_date": "2025-01-09",
+  "features": {
+    "ret_5": 0.0222,
+    "ret_10": -0.0985,
+    "ret_20": -0.0823,
+    "close_to_ma10": 0.988,
+    "close_to_ma20": 0.9245,
+    "pos_20": 0.1534,
+    "body_pct": 0.0113,
+    "amplitude": 0.0595,
+    "volume_log": 16.3364,
+    "amt_log": 19.0159,
+    "amt_zscore_20": -0.0831,
+    "volatility_10": 0.0283,
+    "volatility_20": 0.0288,
+    "vol_ratio_5_20": 0.8807,
+    "dJ_3": 21.2695,
+    "amt_ma20_ratio": 0.9687,
+    "volume_zscore_20": 0.1457,
+    "volume_ma20_ratio": 1.0462,
+    "dK_1": 5.0402,
+    "J_minus_D": 13.2849
+  }
+}

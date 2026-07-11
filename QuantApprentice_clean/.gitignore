@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.DS_Store
+reports/
+research_memory/
+day_klines/
+*.joblib
+*.csv.gz
+*.png
+*.pdf

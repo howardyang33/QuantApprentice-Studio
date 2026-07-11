@@ -1,0 +1,33 @@
+# Python cache and local environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Local secrets
+.env
+*.env
+
+# Logs and temporary files
+*.log
+.DS_Store
+
+# Studio generated data, artifacts, and run outputs
+QuantApprentice_studio/runs/
+QuantApprentice_studio/imports/
+QuantApprentice_studio/demo_assets/
+QuantApprentice_studio/test_reports/
+QuantApprentice_studio/provenance/
+QuantApprentice_studio/src/quant_apprentice_studio.egg-info/
+
+# Clean-core generated artifacts
+QuantApprentice_clean/reports/
+QuantApprentice_clean/research_memory/
+
+# Frontend / packaging artifacts if added later
+node_modules/
+dist/
+build/

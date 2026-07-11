@@ -1,0 +1,18 @@
+name: quant_apprentice_studio
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - numpy>=1.23
+  - pandas>=1.5
+  - joblib>=1.2
+  - matplotlib>=3.8
+  - requests>=2.31
+  - scipy>=1.10
+  - scikit-learn>=1.3
+  - xgboost>=2.0
+  - fastapi>=0.115
+  - uvicorn>=0.30
+  - pip:
+      - -e .
